@@ -7,7 +7,9 @@ export class CdkStarterStack extends cdk.Stack {
     super(scope, id, props);
 
     // 👇 create the s3 bucket
-    const bucket = new s3.Bucket(this, 'bucket-id');
+    const bucket = new s3.Bucket(this, 'bucket-id', {
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
 
     // 👇 create the bucket policy
     const bucketPolicy = new s3.BucketPolicy(this, 'bucket-policy-id', {
@@ -18,10 +20,7 @@ export class CdkStarterStack extends cdk.Stack {
     bucketPolicy.document.addStatements(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
-        principals: [
-          new iam.AccountRootPrincipal(),
-          new iam.ServicePrincipal('lambda.amazonaws.com'),
-        ],
+        principals: [new iam.ServicePrincipal('lambda.amazonaws.com')],
         actions: ['s3:GetObject'],
         resources: [`${bucket.bucketArn}/*`],
       }),
